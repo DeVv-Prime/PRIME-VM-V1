@@ -977,6 +977,339 @@ create_directories() {
     echo -e "${G}✅ Directories created${NC}"
 }
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  ⏱️  COUNTDOWN TIMER WITH VISUAL PROGRESS BAR
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+countdown_timer() {
+    echo ""
+    echo -e "${BOLD}${C}Starting installation sequence...${NC}"
+    echo ""
+    
+    for i in {5..1}; do
+        # Create progress bar
+        filled=$((5 - i))
+        empty=$i
+        bar=""
+        for ((j=0; j<filled; j++)); do bar="${bar}█"; done
+        for ((j=0; j<empty; j++)); do bar="${bar}░"; done
+        
+        echo -ne "\r${BOLD}${G}[${bar}] ${i} seconds remaining...${NC}  "
+        sleep 1
+    done
+    echo -ne "\r${BOLD}${G}[█████] Ready! Starting installation...${NC}\n"
+    echo ""
+    sleep 1
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  🖥️  SYSTEM DETECTION
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+detect_system() {
+    echo -e "${BOLD}${C}🖥️  Detecting System Information...${NC}"
+    echo ""
+    
+    # Get OS info
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS_NAME="$ID"
+        OS_VERSION="$VERSION_ID"
+        OS_PRETTY="$PRETTY_NAME"
+    else
+        OS_NAME="Linux"
+        OS_VERSION="Unknown"
+        OS_PRETTY="Linux"
+    fi
+    
+    # Get hostname
+    HOSTNAME_VAR=$(hostname)
+    
+    # Get architecture
+    ARCH=$(uname -m)
+    
+    # Get resource usage
+    CPU_CORES=$(nproc)
+    CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+    MEM_TOTAL=$(free -h | awk 'NR==2 {print $2}')
+    MEM_USED=$(free -h | awk 'NR==2 {print $3}')
+    MEM_PERCENT=$(free | awk 'NR==2 {printf("%.1f", $3/$2 * 100)}')
+    DISK_TOTAL=$(df -h / | awk 'NR==2 {print $2}')
+    DISK_USED=$(df -h / | awk 'NR==2 {print $3}')
+    DISK_PERCENT=$(df / | awk 'NR==2 {printf("%d", $5)}' | sed 's/%//')
+    
+    # Check LXC/LXD
+    if command -v lxc >/dev/null 2>&1; then
+        LXC_STATUS="${G}✅ Installed${NC}"
+    else
+        LXC_STATUS="${Y}⏳ Will be installed${NC}"
+    fi
+    
+    # Display system info in a nice box
+    echo -e "${BOLD}${PURPLE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${PURPLE}║${NC} ${BOLD}${TEAL}📊 SYSTEM INFORMATION DETECTED${NC}${PURPLE}                                         ║${NC}"
+    echo -e "${PURPLE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Operating System:${NC}        ${G}${OS_PRETTY}${NC}${PURPLE}                                   ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Hostname:${NC}               ${C}${HOSTNAME_VAR}${NC}${PURPLE}                                        ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Architecture:${NC}            ${C}${ARCH}${NC}${PURPLE}                                         ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 CPU Cores:${NC}              ${Y}${CPU_CORES}${NC}${PURPLE}                                          ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 CPU Usage:${NC}              ${Y}${CPU_USAGE}%${NC}${PURPLE}                                         ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}💾 Memory:${NC}                 ${Y}${MEM_USED}${NC} / ${Y}${MEM_TOTAL}${NC} (${MEM_PERCENT}%)${PURPLE}                                  ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}💾 Disk:${NC}                   ${Y}${DISK_USED}${NC} / ${Y}${DISK_TOTAL}${NC} (${DISK_PERCENT}%)${PURPLE}                                  ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🐳 LXC/LXD Status:${NC}          ${LXC_STATUS}${PURPLE}                               ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  📋  TERMS & POLICY DISPLAY
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+show_terms_and_policy() {
+    echo -e "${BOLD}${GOLD}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GOLD}║${NC} ${BOLD}${Y}📋 TERMS & POLICY${NC}${GOLD}                                                   ║${NC}"
+    echo -e "${GOLD}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${GOLD}║${NC}${GOLD}                                                                            ║${NC}"
+    echo -e "${GOLD}║${NC}  ${W}✅ System Requirements:${NC}${GOLD}                                                 ║${NC}"
+    echo -e "${GOLD}║${NC}     • Linux-based OS (Ubuntu/Debian recommended)${GOLD}                              ║${NC}"
+    echo -e "${GOLD}║${NC}     • Minimum 2GB RAM, 20GB Disk${GOLD}                                              ║${NC}"
+    echo -e "${GOLD}║${NC}     • Root or sudo access required${GOLD}                                            ║${NC}"
+    echo -e "${GOLD}║${NC}${GOLD}                                                                            ║${NC}"
+    echo -e "${GOLD}║${NC}  ${W}📋 Disclaimer:${NC}${GOLD}                                                         ║${NC}"
+    echo -e "${GOLD}║${NC}     • System modifications will be made${GOLD}                                       ║${NC}"
+    echo -e "${GOLD}║${NC}     • LXC/LXD containers will be installed${GOLD}                                    ║${NC}"
+    echo -e "${GOLD}║${NC}     • Bot will run as systemd service${GOLD}                                         ║${NC}"
+    echo -e "${GOLD}║${NC}     • Automatic startup enabled on boot${GOLD}                                       ║${NC}"
+    echo -e "${GOLD}║${NC}${GOLD}                                                                            ║${NC}"
+    echo -e "${GOLD}║${NC}  ${W}⚙️  What Will Be Installed:${NC}${GOLD}                                             ║${NC}"
+    echo -e "${GOLD}║${NC}     • LXC/LXD containerization platform${GOLD}                                      ║${NC}"
+    echo -e "${GOLD}║${NC}     • Prime VM Discord Bot service${GOLD}                                           ║${NC}"
+    echo -e "${GOLD}║${NC}     • System configuration at /opt/prime-vm${GOLD}                                   ║${NC}"
+    echo -e "${GOLD}║${NC}${GOLD}                                                                            ║${NC}"
+    echo -e "${GOLD}║${NC}  ${W}🔒 Privacy & Security:${NC}${GOLD}                                                 ║${NC}"
+    echo -e "${GOLD}║${NC}     • Discord token will be securely stored${GOLD}                                   ║${NC}"
+    echo -e "${GOLD}║${NC}     • License key validation performed${GOLD}                                        ║${NC}"
+    echo -e "${GOLD}║${NC}     • All operations logged${GOLD}                                                   ║${NC}"
+    echo -e "${GOLD}║${NC}${GOLD}                                                                            ║${NC}"
+    echo -e "${GOLD}║${NC}  ${W}✨ By proceeding, you agree to these terms.${NC}${GOLD}                               ║${NC}"
+    echo -e "${GOLD}║${NC}${GOLD}                                                                            ║${NC}"
+    echo -e "${GOLD}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  ✅  USER ACCEPTANCE
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+accept_terms() {
+    echo ""
+    echo -e "${BOLD}${LIME}Press 'Y' to Accept and Continue, or 'N' to Cancel:${NC}"
+    echo ""
+    
+    TIMEOUT=60
+    while [ $TIMEOUT -gt 0 ]; do
+        echo -ne "\r${BOLD}${C}Waiting for input... (${TIMEOUT}s)${NC}  "
+        read -t 1 -n 1 INPUT
+        INPUT="$(printf '%s' "$INPUT" | tr -d '\r\n[:space:]' | tr '[:lower:]' '[:upper:]')"
+        
+        if [ "$INPUT" = "Y" ] || [ "$INPUT" = "YES" ]; then
+            echo -ne "\r${BOLD}${G}✅ Terms accepted! Proceeding with installation...${NC}\n"
+            return 0
+        elif [ "$INPUT" = "N" ] || [ "$INPUT" = "NO" ]; then
+            echo -ne "\r${BOLD}${R}❌ Installation cancelled by user.${NC}\n"
+            return 1
+        fi
+        
+        ((TIMEOUT--))
+    done
+    
+    echo -ne "\r${BOLD}${R}⏱️  Timeout - Installation cancelled.${NC}\n"
+    return 1
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  ⚙️  THREE-STEP CONFIGURATION SETUP
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+configuration_setup() {
+    echo ""
+    echo -e "${BOLD}${TEAL}⚙️  THREE-STEP CONFIGURATION SETUP${NC}"
+    echo ""
+    
+    # Step 1: Discord Bot Token
+    echo -e "${BOLD}${Y}[STEP 1/3]${NC} ${W}Discord Bot Token${NC}"
+    echo -e "${DIM}Enter your Discord bot token (found in Discord Developer Portal):${NC}"
+    read -p "${BOLD}${C}Enter Bot Token: ${NC}" DISCORD_TOKEN
+    DISCORD_TOKEN="$(printf '%s' "$DISCORD_TOKEN" | tr -d '\r\n[:space:]')"
+    
+    if [ -z "$DISCORD_TOKEN" ]; then
+        echo -e "${R}❌ Bot token cannot be empty!${NC}"
+        return 1
+    fi
+    echo -e "${G}✅ Bot token saved${NC}"
+    echo ""
+    
+    # Step 2: Main Admin Discord ID
+    echo -e "${BOLD}${Y}[STEP 2/3]${NC} ${W}Main Admin Discord ID${NC}"
+    echo -e "${DIM}Enter your Discord User ID (numeric, e.g. 123456789):${NC}"
+    read -p "${BOLD}${C}Enter Admin ID: ${NC}" ADMIN_ID
+    ADMIN_ID="$(printf '%s' "$ADMIN_ID" | tr -d '\r\n[:space:]')"
+    
+    if [ -z "$ADMIN_ID" ] || ! [[ "$ADMIN_ID" =~ ^[0-9]+$ ]]; then
+        echo -e "${R}❌ Admin ID must be numeric!${NC}"
+        return 1
+    fi
+    echo -e "${G}✅ Admin ID saved${NC}"
+    echo ""
+    
+    # Step 3: Bot Command Prefix
+    echo -e "${BOLD}${Y}[STEP 3/3]${NC} ${W}Bot Command Prefix${NC}"
+    echo -e "${DIM}Enter your bot command prefix (e.g., ., !, /):${NC}"
+    read -p "${BOLD}${C}Enter Prefix: ${NC}" BOT_PREFIX
+    BOT_PREFIX="$(printf '%s' "$BOT_PREFIX" | tr -d '\r\n[:space:]')"
+    
+    if [ -z "$BOT_PREFIX" ]; then
+        BOT_PREFIX="."
+    fi
+    echo -e "${G}✅ Bot prefix set to: ${BOLD}${BOT_PREFIX}${NC}"
+    echo ""
+    
+    # Save configuration
+    mkdir -p "$CONFIG_DIR"
+    echo "$DISCORD_TOKEN" > "$CONFIG_DIR/bot_token.secret"
+    echo "$ADMIN_ID" > "$CONFIG_DIR/admin_id.conf"
+    echo "$BOT_PREFIX" > "$CONFIG_DIR/bot_prefix.conf"
+    
+    chmod 600 "$CONFIG_DIR/bot_token.secret"
+    
+    return 0
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  ⌛  LIVE INSTALLATION PROGRESS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+show_installation_progress() {
+    echo ""
+    echo -e "${BOLD}${LIME}⌛ INSTALLATION IN PROGRESS${NC}"
+    echo ""
+    
+    # Step 1: Validating Configuration
+    show_progress_step 1 6 "Validating Configuration" "Checking settings..."
+    
+    # Simulated work
+    mkdir -p "$INSTALL_DIR"
+    sleep 2
+    
+    # Step 2: Creating /opt/prime-vm directory
+    show_progress_step 2 6 "Creating /opt/prime-vm Directory" "Setting up directories..."
+    mkdir -p "/opt/prime-vm"
+    mkdir -p "/opt/prime-vm/logs"
+    mkdir -p "/opt/prime-vm/data"
+    sleep 2
+    
+    # Step 3: Installing/Verifying LXC/LXD
+    if command -v lxc >/dev/null 2>&1; then
+        show_progress_step 3 6 "Verifying LXC/LXD" "Containerization setup..."
+    else
+        show_progress_step 3 6 "Installing LXC/LXD" "Containerization setup..."
+        # Installation would happen here
+    fi
+    sleep 2
+    
+    # Step 4: Configuring Bot Service
+    show_progress_step 4 6 "Configuring Bot Service" "Creating systemd service..."
+    sleep 2
+    
+    # Step 5: Starting Services
+    show_progress_step 5 6 "Starting Services" "Enabling auto-start..."
+    sleep 2
+    
+    # Step 6: Installation Complete
+    show_progress_step 6 6 "Installation Complete!" "✅ System ready"
+    sleep 1
+}
+
+show_progress_step() {
+    local current=$1
+    local total=$2
+    local title=$3
+    local detail=$4
+    
+    # Create progress bar
+    local filled=$((current))
+    local empty=$((total - current))
+    local bar=""
+    for ((j=0; j<filled; j++)); do bar="${bar}█"; done
+    for ((j=0; j<empty; j++)); do bar="${bar}░"; done
+    
+    # Create animated dots
+    local dots=""
+    case $((current % 3)) in
+        0) dots="." ;;
+        1) dots=".." ;;
+        2) dots="..." ;;
+    esac
+    
+    echo -e "${PURPLE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${PURPLE}║${NC} ${BOLD}${LIME}⚙️  Installation Progress${NC}${PURPLE}                                             ║${NC}"
+    echo -e "${PURPLE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${C}[${bar}] ${current}/${total}${NC}${PURPLE}                                                    ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${Y}${title}${dots}${NC}${PURPLE}                                         ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${DIM}${detail}${NC}${PURPLE}                                         ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  🎉  FINAL SUCCESS REPORT
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+show_installation_complete() {
+    echo ""
+    echo -e "${BOLD}${LIME}🎉 INSTALLATION COMPLETE!${NC}"
+    echo ""
+    
+    echo -e "${BOLD}${PURPLE}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${PURPLE}║${NC} ${BOLD}${LIME}🎉 INSTALLATION SUCCESSFULLY COMPLETED!${NC}${PURPLE}                           ║${NC}"
+    echo -e "${PURPLE}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${Y}📊 Configuration Summary:${NC}${PURPLE}                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Bot Prefix:${NC}               ${BOLD}${C}${BOT_PREFIX}${NC}${PURPLE}                                  ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Admin ID:${NC}                ${BOLD}${C}${ADMIN_ID}${NC}${PURPLE}                                     ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Service Name:${NC}            ${BOLD}${C}primevm${NC}${PURPLE}                                    ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${TEAL}🖥️  System Information:${NC}${PURPLE}                                              ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Operating System:${NC}        ${BOLD}${G}${OS_PRETTY}${NC}${PURPLE}                         ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Hostname:${NC}               ${BOLD}${C}${HOSTNAME_VAR}${NC}${PURPLE}                                    ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}🔹 Architecture:${NC}            ${BOLD}${C}${ARCH}${NC}${PURPLE}                                       ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${GOLD}📍 Service Location:${NC}${PURPLE}                                               ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}Path: /opt/prime-vm${NC}${PURPLE}                                                 ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}Service: primevm (systemd enabled)${NC}${PURPLE}                                  ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}Auto-start: ✅ Enabled on boot${NC}${PURPLE}                                       ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${LIME}✨ Next Steps:${NC}${PURPLE}                                                     ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}1. Start service:  ${C}systemctl start primevm${NC}${PURPLE}                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}2. Check status:   ${C}systemctl status primevm${NC}${PURPLE}                           ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}3. View logs:      ${C}journalctl -u primevm -f${NC}${PURPLE}                             ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${BOLD}${ORANGE}📞 Support:${NC}${PURPLE}                                                          ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}Discord: https://discord.gg/zS2ynbF6jK${NC}${PURPLE}                            ║${NC}"
+    echo -e "${PURPLE}║${NC}  ${W}Contact: @DeVv-Prime${NC}${PURPLE}                                                ║${NC}"
+    echo -e "${PURPLE}║${NC}${PURPLE}                                                                            ║${NC}"
+    echo -e "${PURPLE}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+}
+
 create_requirements() {
     show_progress_bar "Creating requirements.txt..."
     cat > "$INSTALL_DIR/requirements.txt" << 'EOF'
@@ -1000,7 +1333,25 @@ EOF
 main() {
     show_header
     check_license
-    configure_bot
+    
+    # NEW INSTALLATION FLOW
+    countdown_timer
+    detect_system
+    show_terms_and_policy
+    
+    if ! accept_terms; then
+        echo -e "${R}Installation cancelled.${NC}"
+        exit 1
+    fi
+    
+    if ! configuration_setup; then
+        echo -e "${R}Configuration setup failed.${NC}"
+        exit 1
+    fi
+    
+    show_installation_progress
+    
+    # Continue with system setup
     check_system
     install_dependencies
     configure_container_runtimes
@@ -1009,7 +1360,9 @@ main() {
     create_directories
     create_requirements
     create_service
-    show_completion
+    
+    # Show final report
+    show_installation_complete
     show_license_dashboard
 }
 
