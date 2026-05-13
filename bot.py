@@ -118,7 +118,7 @@ def _parse_admin_ids(raw: str) -> List[int]:
     return ids
 
 
-BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN', "DISCORD_BOT_TOKEN")
+BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN', "MTQ4OTE2NjUwMDc3MzQ5OTAwMQ.G15nif.XgEWIY2JP5lEOZ9qSclQdQunNIDHHohfjLvzls")
 BOT_PREFIX = os.environ.get('BOT_PREFIX', ".")
 BOT_NAME = os.environ.get('BOT_NAME', "NEXVMV1-BOT")
 BOT_AUTHOR = os.environ.get('BOT_AUTHOR', "DeVv-Prime")
@@ -1620,7 +1620,19 @@ def dynamic_prefix(_bot, _message):
 
 bot = commands.Bot(command_prefix=dynamic_prefix, intents=intents, help_command=None)
 bot.start_time = datetime_.datetime.utcnow()
-LICENSE_VERIFIED = get_setting('license_verified', 'false') == 'true'
+LICENSE_KEY_ENV = os.environ.get('LICENSE_KEY', '').strip()
+
+
+def bootstrap_license_state() -> bool:
+    """Trust the installer-provided key first, then fall back to saved DB state."""
+    if LICENSE_KEY_ENV and LICENSE_KEY_ENV.casefold() in VALID_LICENSE_KEYS_LOWER:
+        set_setting('license_verified', 'true')
+        set_setting('license_key', LICENSE_KEY_ENV)
+        return True
+    return get_setting('license_verified', 'false') == 'true'
+
+
+LICENSE_VERIFIED = bootstrap_license_state()
 
 # ==================================================================================================
 #  🎯  VPS MANAGE VIEW WITH ALL BUTTONS
