@@ -1,0 +1,385 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-03-18T00:00:00Z",
+  "main_node": "nyc1-node",
+  "nodes": {
+    "local": {
+      "name": "local",
+      "host": "localhost",
+      "port": 0,
+      "username": "local",
+      "type": "local",
+      "status": "online",
+      "is_main": true,
+      "region": "us",
+      "description": "Main local node",
+      "api_key": "local_node_key_7h8f9g2j3k4l5p6q",
+      "api_url": "http://localhost:8443",
+      "stats": {
+        "total_ram": 32768,
+        "used_ram": 12456,
+        "total_cpu": 16,
+        "used_cpu": 42.3,
+        "total_disk": 2000,
+        "used_disk": 850,
+        "lxc_count": 12,
+        "last_checked": "2025-03-18T10:30:00Z"
+      },
+      "settings": {
+        "max_containers": 100,
+        "default_storage_pool": "default",
+        "allow_overcommit": true,
+        "auto_backup": true,
+        "backup_interval": 12
+      }
+    },
+    "nyc1-node": {
+      "name": "nyc1-node",
+      "host": "192.168.1.100",
+      "port": 22,
+      "username": "root",
+      "password": "SecurePass123!",
+      "type": "remote",
+      "status": "online",
+      "is_main": false,
+      "region": "us-east",
+      "datacenter": "NYC1",
+      "provider": "DigitalOcean",
+      "description": "New York datacenter node",
+      "api_key": "node_key_nyc1_a1b2c3d4e5f6g7h8",
+      "api_url": "https://nyc1-node:8443",
+      "stats": {
+        "total_ram": 16384,
+        "used_ram": 5234,
+        "total_cpu": 8,
+        "used_cpu": 38.7,
+        "total_disk": 500,
+        "used_disk": 210,
+        "lxc_count": 5,
+        "last_checked": "2025-03-18T10:28:00Z"
+      },
+      "settings": {
+        "max_containers": 50,
+        "default_storage_pool": "ssd-pool",
+        "allow_overcommit": false,
+        "auto_backup": true,
+        "backup_interval": 24
+      },
+      "location": {
+        "latitude": 40.7128,
+        "longitude": -74.0060,
+        "city": "New York",
+        "country": "USA"
+      }
+    },
+    "fra1-node": {
+      "name": "fra1-node",
+      "host": "192.168.1.150",
+      "port": 22,
+      "username": "admin",
+      "ssh_key": "/root/.ssh/id_rsa_fra1",
+      "type": "remote",
+      "status": "online",
+      "is_main": false,
+      "region": "eu-central",
+      "datacenter": "FRA1",
+      "provider": "Hetzner",
+      "description": "Frankfurt Germany node",
+      "api_key": "node_key_fra1_j9k8l7m6n5b4v3c2",
+      "api_url": "https://fra1-node:8443",
+      "stats": {
+        "total_ram": 32768,
+        "used_ram": 12456,
+        "total_cpu": 16,
+        "used_cpu": 52.1,
+        "total_disk": 1000,
+        "used_disk": 645,
+        "lxc_count": 18,
+        "last_checked": "2025-03-18T10:29:00Z"
+      },
+      "settings": {
+        "max_containers": 80,
+        "default_storage_pool": "default",
+        "allow_overcommit": true,
+        "auto_backup": true,
+        "backup_interval": 12
+      },
+      "location": {
+        "latitude": 50.1109,
+        "longitude": 8.6821,
+        "city": "Frankfurt",
+        "country": "Germany"
+      }
+    },
+    "sgp1-node": {
+      "name": "sgp1-node",
+      "host": "192.168.1.200",
+      "port": 22,
+      "username": "ubuntu",
+      "password": "UbuntuPass!@#$",
+      "type": "remote",
+      "status": "online",
+      "is_main": false,
+      "region": "asia-southeast",
+      "datacenter": "SGP1",
+      "provider": "AWS",
+      "description": "Singapore node",
+      "api_key": "node_key_sgp1_p9o8i7u6y5t4r3e2",
+      "api_url": "https://sgp1-node:8443",
+      "stats": {
+        "total_ram": 8192,
+        "used_ram": 3678,
+        "total_cpu": 4,
+        "used_cpu": 67.8,
+        "total_disk": 250,
+        "used_disk": 189,
+        "lxc_count": 7,
+        "last_checked": "2025-03-18T10:27:00Z"
+      },
+      "settings": {
+        "max_containers": 30,
+        "default_storage_pool": "default",
+        "allow_overcommit": false,
+        "auto_backup": true,
+        "backup_interval": 24
+      },
+      "location": {
+        "latitude": 1.3521,
+        "longitude": 103.8198,
+        "city": "Singapore",
+        "country": "Singapore"
+      }
+    },
+    "syd1-node": {
+      "name": "syd1-node",
+      "host": "192.168.1.250",
+      "port": 22,
+      "username": "root",
+      "password": "RootPass@2025",
+      "type": "remote",
+      "status": "offline",
+      "is_main": false,
+      "region": "australia",
+      "datacenter": "SYD1",
+      "provider": "Vultr",
+      "description": "Sydney Australia node",
+      "api_key": "node_key_syd1_w2e3r4t5y6u7i8o9",
+      "api_url": "https://syd1-node:8443",
+      "stats": {
+        "total_ram": 16384,
+        "used_ram": 0,
+        "total_cpu": 8,
+        "used_cpu": 0,
+        "total_disk": 500,
+        "used_disk": 0,
+        "lxc_count": 0,
+        "last_checked": "2025-03-18T09:15:00Z"
+      },
+      "settings": {
+        "max_containers": 40,
+        "default_storage_pool": "default",
+        "allow_overcommit": true,
+        "auto_backup": true,
+        "backup_interval": 24
+      },
+      "location": {
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "city": "Sydney",
+        "country": "Australia"
+      }
+    }
+  },
+  "node_groups": {
+    "us": ["local", "nyc1-node"],
+    "us-east": ["nyc1-node"],
+    "us-west": [],
+    "eu": ["fra1-node"],
+    "eu-central": ["fra1-node"],
+    "asia": ["sgp1-node"],
+    "asia-southeast": ["sgp1-node"],
+    "australia": ["syd1-node"],
+    "all": ["local", "nyc1-node", "fra1-node", "sgp1-node", "syd1-node"],
+    "production": ["nyc1-node", "fra1-node"],
+    "staging": ["local", "sgp1-node"],
+    "backup": ["syd1-node"]
+  },
+  "node_templates": {
+    "basic": {
+      "username": "root",
+      "port": 22,
+      "region": "us",
+      "max_containers": 20,
+      "default_storage_pool": "default",
+      "allow_overcommit": false,
+      "auto_backup": false
+    },
+    "high_performance": {
+      "username": "root",
+      "port": 22,
+      "region": "us",
+      "max_containers": 100,
+      "default_storage_pool": "ssd-pool",
+      "allow_overcommit": true,
+      "auto_backup": true,
+      "backup_interval": 12
+    },
+    "storage": {
+      "username": "root",
+      "port": 22,
+      "region": "us",
+      "max_containers": 10,
+      "default_storage_pool": "large-pool",
+      "allow_overcommit": false,
+      "auto_backup": true,
+      "backup_interval": 24
+    },
+    "development": {
+      "username": "ubuntu",
+      "port": 22,
+      "region": "asia",
+      "max_containers": 5,
+      "default_storage_pool": "default",
+      "allow_overcommit": true,
+      "auto_backup": false
+    }
+  },
+  "node_connections": {
+    "ssh_config": {
+      "timeout": 30,
+      "keepalive": 60,
+      "compression": true,
+      "ciphers": ["aes256-ctr", "aes192-ctr", "aes128-ctr"],
+      "macs": ["hmac-sha2-256", "hmac-sha2-512"],
+      "kex_algorithms": ["diffie-hellman-group-exchange-sha256", "ecdh-sha2-nistp256"]
+    },
+    "api_config": {
+      "timeout": 10,
+      "retry_count": 3,
+      "retry_delay": 2,
+      "verify_ssl": false,
+      "rate_limit": 100,
+      "rate_period": 60
+    }
+  },
+  "node_monitoring": {
+    "check_interval": 300,
+    "alert_on_offline": true,
+    "alert_on_high_load": true,
+    "high_load_threshold": 80,
+    "alert_on_low_disk": true,
+    "low_disk_threshold": 10,
+    "alert_on_high_memory": true,
+    "high_memory_threshold": 85,
+    "alert_channels": ["discord", "webhook", "email"],
+    "webhook_url": "https://discord.com/api/webhooks/your_webhook_id/your_webhook_token",
+    "email_recipients": ["admin@svm5-bot.com"],
+    "auto_reconnect": true,
+    "max_retries": 5,
+    "retry_interval": 60,
+    "notification_cooldown": 3600
+  },
+  "node_sync": {
+    "auto_sync": true,
+    "sync_interval": 3600,
+    "sync_on_startup": true,
+    "sync_containers": true,
+    "sync_images": true,
+    "sync_networks": true,
+    "sync_storage": false,
+    "sync_profiles": true,
+    "sync_projects": true,
+    "conflict_resolution": "master_wins",
+    "sync_log_path": "/opt/svm5-bot/logs/sync.log"
+  },
+  "node_backup": {
+    "enabled": true,
+    "backup_interval": 24,
+    "backup_retention": 7,
+    "backup_path": "/opt/svm5-bot/backups/nodes/",
+    "backup_config": true,
+    "backup_containers": false,
+    "backup_images": false,
+    "backup_networks": true,
+    "compression": true,
+    "encryption": false,
+    "encryption_key": "",
+    "backup_notifications": true
+  },
+  "node_health": {
+    "cpu_threshold": 90,
+    "ram_threshold": 90,
+    "disk_threshold": 90,
+    "network_threshold": 1000,
+    "check_services": ["lxd", "ssh", "api", "lxc"],
+    "auto_recovery": true,
+    "recovery_actions": ["restart_service", "reboot_node", "notify_admin"],
+    "max_recovery_attempts": 3,
+    "recovery_cooldown": 300,
+    "service_restart_commands": {
+      "lxd": "systemctl restart lxd",
+      "ssh": "systemctl restart ssh",
+      "api": "systemctl restart svm5-api"
+    }
+  },
+  "node_auto_scaling": {
+    "enabled": false,
+    "min_nodes": 1,
+    "max_nodes": 10,
+    "scale_up_threshold": 80,
+    "scale_down_threshold": 30,
+    "check_interval": 600,
+    "provider": "digitalocean",
+    "api_token": "",
+    "region": "nyc1",
+    "size": "s-2vcpu-4gb",
+    "image": "ubuntu-22-04-x64"
+  },
+  "node_load_balancing": {
+    "enabled": true,
+    "strategy": "round_robin",
+    "prioritize_region": true,
+    "default_region": "us",
+    "fallback_nodes": ["local"],
+    "sticky_sessions": false,
+    "health_check_interval": 60
+  },
+  "node_quotas": {
+    "default": {
+      "max_containers": 10,
+      "max_ram": 8192,
+      "max_cpu": 4,
+      "max_disk": 100,
+      "max_networks": 2
+    },
+    "premium": {
+      "max_containers": 50,
+      "max_ram": 32768,
+      "max_cpu": 16,
+      "max_disk": 500,
+      "max_networks": 5
+    },
+    "enterprise": {
+      "max_containers": 200,
+      "max_ram": 131072,
+      "max_cpu": 64,
+      "max_disk": 2000,
+      "max_networks": 10
+    }
+  },
+  "node_metadata": {
+    "created_by": "Ankit-Dev",
+    "created_at": "2025-03-18T00:00:00Z",
+    "last_modified": "2025-03-18T10:30:00Z",
+    "modified_by": "system",
+    "version_history": [
+      {
+        "version": "1.0.0",
+        "date": "2025-03-18T00:00:00Z",
+        "changes": "Initial node configuration"
+      }
+    ],
+    "tags": ["production", "managed", "high-availability"],
+    "notes": "Main node configuration file for SVM5-BOT cluster management"
+  }
+}
