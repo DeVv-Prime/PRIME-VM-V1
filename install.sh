@@ -608,18 +608,20 @@ process_direct_key_entry() {
             continue
         fi
         
+        KEY_NORMALIZED=$(printf '%s' "$KEY" | tr '[:upper:]' '[:lower:]')
+
         # Check for special lifetime key
-        if [[ "$KEY" == "1kapi" ]]; then
+        if [[ "$KEY_NORMALIZED" == "1kapi" ]]; then
             validate_and_save_license "$KEY" "Lifetime" "∞"
             return 0
         fi
         
         # Check other valid keys
-        VALID_KEYS=("Pushkar931222" "NEX5-PRO-2025" "NEX5-ENTERPRISE" "DEVELOPER-ANKIT" "Prime123" "GameHindu" "pushkarbhau" "Primedragon" "DeVv-Prime-Master" "DEVVP-ROOT-ACCESS" "PRIME-ADMIN-2025" "VEDANT-ADMIN-KEY" "DEVVP-MASTER-KEY-2025" "PRIME-ACCESS-GRANTED" "VEDANT-SUPER-KEY" "DEVVP-DEMO-2025")
+        VALID_KEYS=("Pushkar931222" "NEX5-PRO-2025" "NEX5-ENTERPRISE" "DEVELOPER-ANKIT" "Prime123" "GameHindu" "pushkarbhau" "primebhau" "primebahu" "Primedragon" "DeVv-Prime-Master" "DEVVP-ROOT-ACCESS" "PRIME-ADMIN-2025" "VEDANT-ADMIN-KEY" "DEVVP-MASTER-KEY-2025" "PRIME-ACCESS-GRANTED" "VEDANT-SUPER-KEY" "DEVVP-DEMO-2025")
         
         LICENSE_VALID=false
         for valid_key in "${VALID_KEYS[@]}"; do
-            if [[ "$KEY" == "$valid_key" ]]; then
+            if [[ "$KEY_NORMALIZED" == "$(printf '%s' "$valid_key" | tr '[:upper:]' '[:lower:]')" ]]; then
                 LICENSE_VALID=true
                 break
             fi
@@ -673,18 +675,20 @@ process_payment_license() {
             continue
         fi
         
+        KEY_NORMALIZED=$(printf '%s' "$KEY" | tr '[:upper:]' '[:lower:]')
+
         # Check for special lifetime key
-        if [[ "$KEY" == "1kapi" ]]; then
+        if [[ "$KEY_NORMALIZED" == "1kapi" ]]; then
             validate_and_save_license "$KEY" "Lifetime" "∞"
             return 0
         fi
         
         # Check valid keys for this license type
-        VALID_KEYS=("Pushkar931222" "NEX5-PRO-2025" "NEX5-ENTERPRISE" "DEVELOPER-ANKIT" "Prime123" "GameHindu" "pushkarbhau" "Primedragon" "DeVv-Prime-Master" "DEVVP-ROOT-ACCESS" "PRIME-ADMIN-2025" "VEDANT-ADMIN-KEY" "DEVVP-MASTER-KEY-2025" "PRIME-ACCESS-GRANTED" "VEDANT-SUPER-KEY")
+        VALID_KEYS=("Pushkar931222" "NEX5-PRO-2025" "NEX5-ENTERPRISE" "DEVELOPER-ANKIT" "Prime123" "GameHindu" "pushkarbhau" "primebhau" "primebahu" "Primedragon" "DeVv-Prime-Master" "DEVVP-ROOT-ACCESS" "PRIME-ADMIN-2025" "VEDANT-ADMIN-KEY" "DEVVP-MASTER-KEY-2025" "PRIME-ACCESS-GRANTED" "VEDANT-SUPER-KEY")
         
         LICENSE_VALID=false
         for valid_key in "${VALID_KEYS[@]}"; do
-            if [[ "$KEY" == "$valid_key" ]]; then
+            if [[ "$KEY_NORMALIZED" == "$(printf '%s' "$valid_key" | tr '[:upper:]' '[:lower:]')" ]]; then
                 LICENSE_VALID=true
                 break
             fi
@@ -802,6 +806,7 @@ PMV_BOT_BASE_DIR=$INSTALL_DIR
 
 # License Information
 LICENSE_ACTIVATED=true
+LICENSE_VERIFIED=true
 LICENSE_TYPE=Lifetime
 LICENSE_KEY=$KEY
 EOF
