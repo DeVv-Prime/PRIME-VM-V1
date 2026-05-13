@@ -61,7 +61,7 @@ BG_ORANGE='\033[48;5;214m'
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Main Directories
-INSTALL_DIR="/opt/primevm"
+INSTALL_DIR="/opt/prime-vm"
 BOT_SCRIPT="primevm.py"
 SERVICE_NAME="primevm"
 LOG_FILE="/var/log/primevm.log"
@@ -1332,6 +1332,79 @@ EOF
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  🔽  CLONE REPO & PREPARE ENV
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+clone_and_prepare() {
+    echo -e "${C}🔄 Cloning PRIME-VM repository into $INSTALL_DIR...${NC}"
+
+    # Ensure install dir exists
+    mkdir -p "$INSTALL_DIR"
+
+    if command -v git >/dev/null 2>&1; then
+        if [ -d "$INSTALL_DIR/.git" ]; then
+            echo -e "${Y}Repository already present, pulling latest changes...${NC}"
+            git -C "$INSTALL_DIR" pull --rebase || true
+        else
+            git clone --depth 1 https://github.com/DeVv-Prime/PRIME-VM-V1.git "$INSTALL_DIR" 2>/dev/null || {
+                echo -e "${R}⚠️ Git clone failed, will fallback to bundled files${NC}"
+                return 1
+            }
+        fi
+    else
+        echo -e "${Y}Git not found, attempting to install git...${NC}"
+        if command -v apt-get >/dev/null 2>&1; then
+            apt-get update -y && apt-get install -y git || true
+        elif command -v yum >/dev/null 2>&1; then
+            yum install -y git || true
+        fi
+
+        if command -v git >/dev/null 2>&1; then
+            git clone --depth 1 https://github.com/DeVv-Prime/PRIME-VM-V1.git "$INSTALL_DIR" 2>/dev/null || {
+                echo -e "${R}⚠️ Git clone failed after install${NC}"
+                return 1
+            }
+        else
+            echo -e "${R}⚠️ Git unavailable, skipping clone${NC}"
+            return 1
+        fi
+    fi
+
+    # Virtualenv + requirements
+    if [ -f "$INSTALL_DIR/requirements.txt" ]; then
+        echo -e "${C}🔧 Setting up Python virtual environment...${NC}"
+        python3 -m venv "$INSTALL_DIR/venv" 2>/dev/null || {
+            echo -e "${Y}⚠️ venv creation failed — will attempt to use system python${NC}"
+        }
+
+        if [ -x "$INSTALL_DIR/venv/bin/pip" ]; then
+            "$INSTALL_DIR/venv/bin/pip" install --upgrade pip 2>/dev/null || true
+            "$INSTALL_DIR/venv/bin/pip" install -r "$INSTALL_DIR/requirements.txt" || echo -e "${Y}⚠️ Some packages failed to install in venv${NC}"
+        else
+            echo -e "${Y}Using system pip to install requirements...${NC}"
+            pip3 install --user -r "$INSTALL_DIR/requirements.txt" || echo -e "${Y}⚠️ pip install had issues${NC}"
+        fi
+    fi
+
+    # Ensure bot script exists - fallback to local copy
+    if [ ! -f "$INSTALL_DIR/$BOT_SCRIPT" ]; then
+        if [ -f "$(dirname "$0")/bot.py" ]; then
+            cp "$(dirname "$0")/bot.py" "$INSTALL_DIR/$BOT_SCRIPT" 2>/dev/null || true
+        fi
+    fi
+
+    # Copy env into repo (optional)
+    if [ -f "$CONFIG_DIR/bot.env" ]; then
+        cp "$CONFIG_DIR/bot.env" "$INSTALL_DIR/.env" 2>/dev/null || true
+    fi
+
+    chown -R root:root "$INSTALL_DIR" 2>/dev/null || true
+    chmod -R 755 "$INSTALL_DIR" 2>/dev/null || true
+
+    echo -e "${G}✅ Repository cloned and prepared at $INSTALL_DIR${NC}"
+}
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  🎯  MAIN INSTALLATION FUNCTION
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -1364,6 +1437,7 @@ main() {
     configure_firewall
     create_directories
     create_requirements
+    clone_and_prepare
     create_service
     
     # Show final report
